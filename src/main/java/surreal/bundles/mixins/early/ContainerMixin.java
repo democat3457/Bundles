@@ -1,6 +1,5 @@
 package surreal.bundles.mixins.early;
 
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -11,16 +10,19 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+
 import surreal.bundles.Bundles;
 import surreal.bundles.ModConfig;
 import surreal.bundles.ModSounds;
 import surreal.bundles.items.ItemBundle;
+import surreal.bundles.mixins.interfaces.IExtendedSlotClick;
 
 import java.util.List;
 import java.util.Set;
 
 @Mixin(Container.class)
-public abstract class ContainerMixin {
+public abstract class ContainerMixin implements IExtendedSlotClick {
 
     @Shadow public abstract void detectAndSendChanges();
 
@@ -46,6 +48,11 @@ public abstract class ContainerMixin {
      */
     @Overwrite
     public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+        return slotClick(slotId, dragType, clickTypeIn, false, player);
+    }
+
+    @Unique
+    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, boolean ctrlHeld, EntityPlayer player) {
         ItemStack itemstack = ItemStack.EMPTY;
         InventoryPlayer inventoryplayer = player.inventory;
 
@@ -86,7 +93,7 @@ public abstract class ContainerMixin {
                 }
                 else if (dragType == 5 && slot7 != null && itemstack12.getItem() instanceof ItemBundle && ItemBundle.getItemAmount(itemstack12) > 0) {
                     if (ItemBundle.getItemAmount(itemstack12) > 0) {
-                        int slot = GuiScreen.isCtrlKeyDown() ? Integer.MAX_VALUE : 0;
+                        int slot = ctrlHeld ? Integer.MAX_VALUE : 0;
                         ItemStack st = ItemBundle.getItem(itemstack12, slot);
 
                         if (Container.canAddItemToSlot(slot7, st, true) && slot7.isItemValid(st)) {
@@ -203,7 +210,7 @@ public abstract class ContainerMixin {
                     {
                         if (itemstack11.getItem() instanceof ItemBundle && ItemBundle.getItemAmount(itemstack11) > 0) {
                             if (dragType == 1) {
-                                int slot = GuiScreen.isCtrlKeyDown() ? Integer.MAX_VALUE : 0;
+                                int slot = ctrlHeld ? Integer.MAX_VALUE : 0;
                                 ItemStack st = ItemBundle.getItem(itemstack11, slot);
 
                                 if (!st.isEmpty() && slot6.isItemValid(st)) {
@@ -239,7 +246,7 @@ public abstract class ContainerMixin {
                             else
                             {
                                 if (dragType == 1 && itemstack8.getItem() instanceof ItemBundle && ItemBundle.getItemAmount(itemstack8) > 0) {
-                                    int slot = GuiScreen.isCtrlKeyDown() ? Integer.MAX_VALUE : 0;
+                                    int slot = ctrlHeld ? Integer.MAX_VALUE : 0;
                                     ItemStack st = ItemBundle.getItem(itemstack8, slot);
 
                                     if (player.world.isRemote) player.playSound(ModSounds.REMOVE, 1, 1);
