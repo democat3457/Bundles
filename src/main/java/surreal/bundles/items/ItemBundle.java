@@ -44,15 +44,6 @@ public class ItemBundle extends Item {
         return b * level;
     };
 
-    @SideOnly(Side.CLIENT)
-    public static IItemColor BUNDLE_COLOR = (stack, tintIndex) -> {
-        if (tintIndex == 0) {
-            return getColor(stack);
-        }
-
-        return 0xFFFFFF;
-    };
-
     public ItemBundle() {
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.MISC);
@@ -265,7 +256,7 @@ public class ItemBundle extends Item {
     }
 
     public static void setColor(ItemStack bundle, EnumDyeColor color) {
-        setColor(bundle, color.getColorValue());
+        setColor(bundle, color.colorValue);
     }
 
     private static void setAmount(ItemStack bundle, int amount) {

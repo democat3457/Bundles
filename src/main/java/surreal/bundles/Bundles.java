@@ -1,6 +1,7 @@
 package surreal.bundles;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
@@ -24,14 +25,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import surreal.bundles.events.TooltipEvent;
 import surreal.bundles.items.ItemBundle;
 import surreal.bundles.recipes.RecipeBundleColoring;
 
 import java.util.Objects;
 import java.util.Set;
 
-@SuppressWarnings("unused")
 @Mod(modid = Bundles.MODID, name = "Bundles", version = Tags.VERSION, dependencies = "required-after:mixinbooter@[4.2,);after:mousetweaks@[3.0,)")
 public class Bundles {
 
@@ -45,7 +44,9 @@ public class Bundles {
     @Mod.EventHandler
     public void construction(FMLConstructionEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new TooltipEvent());
+        if (event.getSide() == Side.CLIENT) {
+            MinecraftForge.EVENT_BUS.register(new surreal.bundles.events.TooltipEvent());
+        }
     }
 
     @Mod.EventHandler
@@ -118,6 +119,13 @@ public class Bundles {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void registerItemColors(ColorHandlerEvent.Item event) {
-        event.getItemColors().registerItemColorHandler(ItemBundle.BUNDLE_COLOR, BUNDLE);
+        IItemColor BUNDLE_COLOR = (stack, tintIndex) -> {
+            if (tintIndex == 0) {
+                return ItemBundle.getColor(stack);
+            }
+
+            return 0xFFFFFF;
+        };
+        event.getItemColors().registerItemColorHandler(BUNDLE_COLOR, BUNDLE);
     }
 }
